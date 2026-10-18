@@ -4171,7 +4171,6 @@ class Index(IndexOpsMixin, PandasObject):
         # searchsorted, and with object dtype they corrupt the positions found
         # for the other values. They are set to -1 by the caller (GH#32572).
         nonexact = (indexer == -1) & ~target._isnan
-
         indexer[nonexact] = self._searchsorted_monotonic(target[nonexact], side)
         if side == "left":
             # searchsorted returns "indices into a sorted array such that,
