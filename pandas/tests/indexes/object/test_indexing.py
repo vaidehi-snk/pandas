@@ -25,6 +25,21 @@ class TestGetIndexer:
 
         tm.assert_numpy_array_equal(actual, expected)
 
+    @pytest.mark.parametrize(
+        "method,expected",
+        [
+            ("pad", [0, -1, 2, 1]),
+            ("backfill", [1, -1, 3, 2]),
+        ],
+    )
+    def test_get_indexer_strings_target_with_nan(self, method, expected):
+        # GH#71295 NaN in the target raised TypeError instead of being
+        # marked as not found
+        index = pd.Index(["a", "c", "e", "g"], dtype=object)
+        target = pd.Index(["b", np.nan, "f", "d"], dtype=object)
+        result = index.get_indexer(target, method=method)
+        tm.assert_numpy_array_equal(result, np.array(expected, dtype=np.intp))
+
     def test_get_indexer_strings_raises(self):
         index = pd.Index(["b", "c"], dtype=object)
 

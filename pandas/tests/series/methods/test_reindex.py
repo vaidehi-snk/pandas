@@ -113,6 +113,24 @@ def test_reindex_pad():
     tm.assert_series_equal(reindexed, expected)
 
 
+@pytest.mark.parametrize(
+    "method,expected",
+    [
+        ("ffill", [20.0, np.nan, 30.0]),
+        ("bfill", [30.0, np.nan, 40.0]),
+        ("nearest", [20.0, np.nan, 30.0]),
+    ],
+)
+def test_reindex_method_object_index_with_nan(method, expected):
+    # GH#71295 a NaN in an object-dtype target index led to wrong values
+    # for the labels after it
+    ser = pd.Series([10, 20, 30, 40], index=[1.0, 2.0, 3.0, 4.0])
+    new_index = pd.Index([2.4, np.nan, 3.4], dtype=object)
+    result = ser.reindex(new_index, method=method)
+    expected = pd.Series(expected, index=new_index)
+    tm.assert_series_equal(result, expected)
+
+
 def test_reindex_pad2():
     # GH4604
     s = pd.Series([1, 2, 3, 4, 5], index=["a", "b", "c", "d", "e"])
